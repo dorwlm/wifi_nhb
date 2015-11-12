@@ -25,22 +25,27 @@ def fetch_wireless_cards():
 
     #print interfaces
 
+#should return interface with monitor feature that didnt tested yet
+#for should die, need to use while or to change interfaces{} to something more suiteble for our needs
 def find_wireless_nic():
+    #will die! only for test
     for interface, value in interfaces.iteritems():
         print "interface: " + interface
         print "value: %s" % str(value)
         if 'Monitor' in value.keys():
             print "value is monitor"
+
     ######################################### - do!!
     print "###################while####################"
+    #need to check it!!
     i=0
     found=False
     while(i<len(interfaces)):
         interface = interfaces.keys()[i]
         #print interface
         if 'Monitor' in interfaces[interface].keys():
-
-        i=i+1
+            print "something"
+        i = i + 1
 
 if __name__ == "__main__":
 
