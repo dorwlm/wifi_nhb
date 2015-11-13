@@ -10,6 +10,7 @@ from pythonwifi.iwlibs import *
 import re
 from optparse import OptionParser
 import sys
+from subprocess import call
 
 #store all Wireless NIC
 interfaces = {}
@@ -29,23 +30,52 @@ def fetch_wireless_cards():
 #for should die, need to use while or to change interfaces{} to something more suiteble for our needs
 def find_wireless_nic():
     #will die! only for test
-    for interface, value in interfaces.iteritems():
+    '''for interface, value in interfaces.iteritems():
         print "interface: " + interface
         print "value: %s" % str(value)
         if 'Monitor' in value.keys():
             print "value is monitor"
+    '''
+    #try to find Wireless NIC that already configured as Monitor
 
-    ######################################### - do!!
-    print "###################while####################"
-    #need to check it!!
     i=0
     found=False
-    while(i<len(interfaces)):
+    interface=""
+    while(i<len(interfaces) and not found):
         interface = interfaces.keys()[i]
-        #print interface
+        print "checking interface: " + str(interface)
         if 'Monitor' in interfaces[interface].keys():
-            print "something"
+            print str(interface) + ": mode: Monitor"
+            print "checking " +str(interface)+ " status"
+            if interfaces[interface]['Monitor'] == 1:
+                print str(interface) + ": status 1"
+                found = True
         i = i + 1
+
+    print "will return " + str(interface)
+    if(found): return interface
+    else: "will try to configure interface..."
+
+    #try to configure interface card from the pool
+    i=0
+    configured = False
+    while(i<len(interfaces) and not configured):
+        interface = interfaces.keys()[i]
+        print "checking interface: " + str(interface)
+        #check more mode options
+        if 'Monitor' not in interfaces[interface].keys() and not interfaces[interface]['Managed']==0:
+            #change configuration
+            print "will disable interface"
+            call(["ifconfig",str(interface), "down"])
+            try:
+                Wireless(interface).setMode('Monitor')
+            except ValueError:
+                print "resource is busy"
+
+            print "will enable interface"
+            call(["ifconfig",str(interface), "up"])
+        i=i+1
+
 
 if __name__ == "__main__":
 
@@ -72,10 +102,9 @@ if __name__ == "__main__":
 
     if not options.interface:
         #automatically mode
-        find_wireless_nic()
-
-
-    #print "checking interface %s" % options.interface
-
-    #print "verbose %s" % options.verbose
+        print "Automatic interface mode will being operate"
+        interface = find_wireless_nic()
+        print "returned interface: " + str(interface)
+        #if not working correctly should change status to 0
+        print "try to use this interface if not working blame dorwlm"
 
