@@ -63,6 +63,7 @@ def find_wireless_nic():
         interface = interfaces.keys()[i]
         print "checking interface: " + str(interface)
         #check more mode options
+        #check error raises
         if 'Monitor' not in interfaces[interface].keys() and not interfaces[interface]['Managed']==0:
             #change configuration
             print "will disable interface"
@@ -74,6 +75,12 @@ def find_wireless_nic():
 
             print "will enable interface"
             call(["ifconfig",str(interface), "up"])
+            if Wireless(interface).getMode()== 'Monitor':
+                configured=True
+            else:
+                interfaces[interface]['Managed']=0
+        else:
+            interfaces[interface]['Monitor']=0
         i=i+1
 
 
